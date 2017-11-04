@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">InvoiceQPrint</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="items_fragment">Hello Items fragment</string>
+    <string name="invoices_fragment">hello_invoices_fragment</string>
+    <string name="settings_fragment">hello_settings_fragment</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="bluetooth_none_paired">No devices have been paired</string>
+    <string name="bluetooth_scanning">scanning for devices...</string>
+    <string name="bluetooth_select_device">select a device to connect</string>
+    <string name="bluetooth_none_found">No devices found</string>
+</resources>
