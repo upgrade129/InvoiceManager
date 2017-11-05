@@ -852,7 +852,7 @@ public class BillEntryFragment extends Fragment {
                 if(!editInvice) {
 
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                    dialog.setTitle("Do you want to Delete the item?");
+                    dialog.setTitle("Delete item?");
                     dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

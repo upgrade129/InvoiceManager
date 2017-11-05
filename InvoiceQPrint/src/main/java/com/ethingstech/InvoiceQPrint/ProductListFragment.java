@@ -172,18 +172,27 @@ public class ProductListFragment extends Fragment {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view,
                                                int position, long id) {
-                    View parentView = (View) view.getParent();
-                    TextView taskTextView = (TextView) parentView.findViewById(R.id.textProductlist);
-                    String task = String.valueOf(taskTextView.getText());
-                    String selection = ItemsEntry.TaskEntry.COL_PRODUCT_CODE + " = ?";
-                    String[] selectionArgs = {task.substring(0, task.indexOf(':'))};
-                    SQLiteDatabase db = mHelper.getWritableDatabase();
-                    db.delete(ItemsEntry.TaskEntry.TABLE_PRODUCT, selection, selectionArgs);
-                    db.close();
-                    updateUI();
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                    dialog.setTitle("Delete Product?");
+                    dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            View parentView = getView();
+                            TextView taskTextView = (TextView) parentView.findViewById(R.id.textProductlist);
+                            String task = String.valueOf(taskTextView.getText());
+                            String selection = ItemsEntry.TaskEntry.COL_PRODUCT_CODE + " = ?";
+                            String[] selectionArgs = {task.substring(0, task.indexOf(':'))};
+                            SQLiteDatabase db = mHelper.getWritableDatabase();
+                            db.delete(ItemsEntry.TaskEntry.TABLE_PRODUCT, selection, selectionArgs);
+                            db.close();
+                            updateUI();
+                        }
+                    });
+                    dialog.setNegativeButton("Cancel", null);
+                    dialog.show();
                     return true;
                 }
-        });
+         });
         return view;
     }
 
