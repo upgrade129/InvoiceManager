@@ -181,14 +181,14 @@ public class BillEntryFragment extends Fragment {
         }
         else
         {
-            if(connectionObj.getConnectionStatus() == false)
+            if(!connectionObj.getConnectionStatus())
                 connectionObj.connectPrinter(macid);
         }
         mContext = this.getContext();
         View view = inflater.inflate(R.layout.fragment_bill_entry, container, false);
         addressView = (TextView) view.findViewById(R.id.address);
         mItemsListView = (ListView) view.findViewById(R.id.add_items);
-        arrayadapter = new ArrayAdapter<String>(this.getContext(),android.R.layout.simple_list_item_1, subjects);
+        arrayadapter = new ArrayAdapter<>(this.getContext(),android.R.layout.simple_list_item_1, subjects);
         mItemsListView.setAdapter(arrayadapter);
         mItemsListView.setLongClickable(true);
         mItemsListView.setOnTouchListener(new View.OnTouchListener() {
@@ -220,7 +220,7 @@ public class BillEntryFragment extends Fragment {
                             Log.d(TAG, "Key ENTER: " + geScanCode);
                             if (searchProductListForScan(geScanCode)) {
 
-                                Double finalValue = 0.0;
+                                Double finalValue;
                                 Double tax = 0.0;
                                 String item = pName;
                                 String quan = "1";
@@ -328,20 +328,24 @@ public class BillEntryFragment extends Fragment {
         invoicePhNumber = getArguments().getString("InvoicePh");
         Date = getArguments().getString("ivDate");
         Time = getArguments().getString("ivTime");
-        if(user.contentEquals("New")) {
-            invoice = Integer.parseInt(getArguments().getString("invoiceNumber")) + 1;
-            editInvice = false;
-            paymentCycle = 0;
-            balancePayment = 0;
-            invoiceSerial = invoiceSerial+invoice;
-        }
-        else
+        try {
+            if(user.contentEquals("New")) {
+                invoice = Integer.parseInt(getArguments().getString("invoiceNumber")) + 1;
+                editInvice = false;
+                paymentCycle = 0;
+                balancePayment = 0;
+                invoiceSerial = invoiceSerial+invoice;
+            }
+            else
+            {
+                editInvice = true;
+                invoice = Integer.parseInt(user);
+                paymentCycle = Integer.parseInt(getArguments().getString("PaymentCycle"));
+                balancePayment = Double.parseDouble(getArguments().getString("balancePayment"));
+                invoiceSerial = getArguments().getString("prefix");
+            }
+        }catch(NullPointerException e)
         {
-            editInvice = true;
-            invoice = Integer.parseInt(user);
-            paymentCycle = Integer.parseInt(getArguments().getString("PaymentCycle"));
-            balancePayment = Double.parseDouble(getArguments().getString("balancePayment"));
-            invoiceSerial = getArguments().getString("prefix");
         }
         Log.d(TAG, "Invoice Name :" + invoiceName);
         Log.d(TAG, "Invoice List :" + invoicePhNumber);
@@ -360,7 +364,7 @@ public class BillEntryFragment extends Fragment {
 
          backInvoice.setOnClickListener(new View.OnClickListener() {
                   public void onClick(View v) {
-                      if(editInvice == false) {
+                      if(!editInvice) {
                           AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                           dialog.setTitle("Do you want to Discard the Invoice?");
                           dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -528,11 +532,11 @@ public class BillEntryFragment extends Fragment {
                             values.put(ItemsEntry.TaskEntry.COL_INVOICE_RES2, "false");
                             values.put(ItemsEntry.TaskEntry.COL_INVOICE_RES3, "false");
 
-                            if(editInvice == true)
+                            if(editInvice)
                             {
                                 String selection = ItemsEntry.TaskEntry.COL_INVOICE_SERIAL + " = ?";
                                 String[] selectionArgs = {String.valueOf(invoice)};
-                                if(updatePayment == true)
+                                if(updatePayment)
                                 db.update(ItemsEntry.TaskEntry.TABLE_INVOICE_LIST,values,selection,selectionArgs);
                             }
                             else
@@ -543,7 +547,7 @@ public class BillEntryFragment extends Fragment {
                             db.close();
 
                             /*Update last payment table*/
-                            if( updatePayment == true)
+                            if( updatePayment)
                             {
                                 SQLiteDatabase db2 = mHelper.getWritableDatabase();
                                 ContentValues values2 = new ContentValues();
@@ -573,7 +577,7 @@ public class BillEntryFragment extends Fragment {
            }
         });
         final Button addIVItem = (Button)view.findViewById(R.id.IV_Add);
-        if(editInvice == true)
+        if(editInvice)
             addIVItem.setEnabled(false);
         else
             addIVItem.setEnabled(true);
@@ -845,14 +849,14 @@ public class BillEntryFragment extends Fragment {
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            int position, long id) {
                 // TODO Auto-generated method stub
-                if(editInvice == false) {
+                if(!editInvice) {
 
                     AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                    dialog.setTitle("Do you want to Delete the item?");
+                    dialog.setTitle("Delete item?");
                     dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            View parentView = (View) getView();
+                            View parentView = getView();
                             TextView taskTextView = (TextView) parentView.findViewById(R.id.textViewlist);
                             String task = String.valueOf(taskTextView.getText());
                             String selection = ItemsEntry.TaskEntry.COL_PRODUCT_ID + " = ?";
@@ -886,12 +890,7 @@ public class BillEntryFragment extends Fragment {
 
         public void onClick(View v) {
             Log.d(TAG, "onClick:");
-            switch (v.getId()) {
-               /* case R.id.add_entry:
-                    Log.d(TAG, "button Click:");
-                    addItemtoDB();
-                   break;*/
-             }
+
         }
     }
 
@@ -1033,7 +1032,7 @@ public class BillEntryFragment extends Fragment {
 
        taskList.add("                                                  Total ₹: "+ invoiceTotal);
        paymentsofar = 0.0;
-       if(editInvice == true)
+       if(editInvice)
        {
            int count =0;
            String StringToPrint;
@@ -1154,6 +1153,7 @@ public class BillEntryFragment extends Fragment {
         itemSGST.setText(cursor.getString(idx5));
         itemCGST.setText(cursor.getString(idx6));
         itemOffer.setText(cursor.getString(idx7));
+        cursor.close();
         ll.addView(itemTitle);
         ll.addView(itemName);
         ll.addView(qantityTitle);
@@ -1247,6 +1247,7 @@ public class BillEntryFragment extends Fragment {
             }
         }
         db.close();
+        cursor.close();
         return 0.0;
     }
     public String searchProductNameList(String serachText)
@@ -1279,6 +1280,7 @@ public class BillEntryFragment extends Fragment {
             }
         }
         db.close();
+        cursor.close();
         return "0";
     }
     public String getQuickProductList(String task)
@@ -1470,10 +1472,8 @@ public class BillEntryFragment extends Fragment {
             String[] selectionArgs1 = {cursor.getString(cursor.getColumnIndex(ItemsEntry.TaskEntry.COL_PRODUCT_CODE))};
             productCheck.update(ItemsEntry.TaskEntry.TABLE_PRODUCT, values, selection, selectionArgs1);
             productCheck.close();
-            cursor.close();
         }
-
-
+        cursor.close();
     }
     public void printInvoice()
     {
