@@ -33,3 +33,4 @@ The printer is portable Battery operated Bluetooth/USB Thermal Receipt Printer w
 - non stop printing 120 - 150 m thermal roll
 
 Please mail to "connect@ethingstech.com" for printer enquiry.
+"# InvoiceManager" 
